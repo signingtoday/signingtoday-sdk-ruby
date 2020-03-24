@@ -4,14 +4,14 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reason** | **String** | This is the actual reason why the Digital Signature Transaction is going to be canceled, to be provided in the body of the request  | [optional] 
+**password** | **String** | The password of the Identity | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineObject1.new(reason: Reason for the cancellation)
+instance = SigningTodayAPIClient::InlineObject1.new(password: A12345678Z)
 ```
 
 

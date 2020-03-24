@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**cancel_dst**](Bit4idPathgroupSignatureTransactionsApi.md#cancel_dst) | **POST** /{organization-id}/signature-transactions/{dst-id}/cancel | Mark a DST as canceled
 [**create_dst**](Bit4idPathgroupSignatureTransactionsApi.md#create_dst) | **POST** /{organization-id}/signature-transactions | Create a Digital Signature Transaction
 [**delete_dst**](Bit4idPathgroupSignatureTransactionsApi.md#delete_dst) | **DELETE** /{organization-id}/signature-transactions/{dst-id} | Delete a Digital Signature Transaction
+[**delete_dst_resources**](Bit4idPathgroupSignatureTransactionsApi.md#delete_dst_resources) | **DELETE** /{organization-id}/signature-transactions/{dst-id}/resources | Delete the resources of a DST
 [**get_document**](Bit4idPathgroupSignatureTransactionsApi.md#get_document) | **GET** /{organization-id}/documents/{document-id}/download | Download a document from a DST
 [**get_dst**](Bit4idPathgroupSignatureTransactionsApi.md#get_dst) | **GET** /{organization-id}/signature-transactions/{dst-id} | Get information about a DST
 [**list_ds_ts**](Bit4idPathgroupSignatureTransactionsApi.md#list_ds_ts) | **GET** /{organization-id}/signature-transactions | List the DSTs of an organization
@@ -15,7 +16,7 @@ Method | HTTP request | Description
 
 ## cancel_dst
 
-> InlineResponse2013 cancel_dst(organization_id, dst_id, inline_object1)
+> InlineResponse2013 cancel_dst(organization_id, dst_id, inline_object2)
 
 Mark a DST as canceled
 
@@ -37,11 +38,11 @@ end
 api_instance = SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi.new
 organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
 dst_id = SigningTodayAPIClient::Id.new # Id | The **dst-id** is the uuid code that identifies a digital signature transaction. It is used as a path parameter to filter the requested operation to the specified **dst** 
-inline_object1 = SigningTodayAPIClient::InlineObject1.new # InlineObject1 | 
+inline_object2 = SigningTodayAPIClient::InlineObject2.new # InlineObject2 | 
 
 begin
   #Mark a DST as canceled
-  result = api_instance.cancel_dst(organization_id, dst_id, inline_object1)
+  result = api_instance.cancel_dst(organization_id, dst_id, inline_object2)
   p result
 rescue SigningTodayAPIClient::ApiError => e
   puts "Exception when calling Bit4idPathgroupSignatureTransactionsApi->cancel_dst: #{e}"
@@ -55,7 +56,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **organization_id** | **String**| The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization  | [default to &#39;api-demo&#39;]
  **dst_id** | [**Id**](.md)| The **dst-id** is the uuid code that identifies a digital signature transaction. It is used as a path parameter to filter the requested operation to the specified **dst**  | 
- **inline_object1** | [**InlineObject1**](InlineObject1.md)|  | 
+ **inline_object2** | [**InlineObject2**](InlineObject2.md)|  | 
 
 ### Return type
 
@@ -129,7 +130,7 @@ Name | Type | Description  | Notes
 
 ## delete_dst
 
-> InlineResponse2007 delete_dst(organization_id, dst_id)
+> InlineResponse2009 delete_dst(organization_id, dst_id)
 
 Delete a Digital Signature Transaction
 
@@ -171,7 +172,63 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2007**](InlineResponse2007.md)
+[**InlineResponse2009**](InlineResponse2009.md)
+
+### Authorization
+
+[ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## delete_dst_resources
+
+> InlineResponse20010 delete_dst_resources(organization_id, dst_id)
+
+Delete the resources of a DST
+
+This API allows to delete the resources of a Digital Signature Transaction. 
+
+### Example
+
+```ruby
+# load the gem
+require 'signing_today_client'
+# setup authorization
+SigningTodayAPIClient.configure do |config|
+  # Configure API key authorization: ApiKeyAuth
+  config.api_key['Authorization'] = 'YOUR API KEY'
+  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
+  #config.api_key_prefix['Authorization'] = 'Bearer'
+end
+
+api_instance = SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi.new
+organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
+dst_id = SigningTodayAPIClient::Id.new # Id | The **dst-id** is the uuid code that identifies a digital signature transaction. It is used as a path parameter to filter the requested operation to the specified **dst** 
+
+begin
+  #Delete the resources of a DST
+  result = api_instance.delete_dst_resources(organization_id, dst_id)
+  p result
+rescue SigningTodayAPIClient::ApiError => e
+  puts "Exception when calling Bit4idPathgroupSignatureTransactionsApi->delete_dst_resources: #{e}"
+end
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **organization_id** | **String**| The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization  | [default to &#39;api-demo&#39;]
+ **dst_id** | [**Id**](.md)| The **dst-id** is the uuid code that identifies a digital signature transaction. It is used as a path parameter to filter the requested operation to the specified **dst**  | 
+
+### Return type
+
+[**InlineResponse20010**](InlineResponse20010.md)
 
 ### Authorization
 
@@ -297,7 +354,7 @@ Name | Type | Description  | Notes
 
 ## list_ds_ts
 
-> InlineResponse2006 list_ds_ts(organization_id, opts)
+> InlineResponse2008 list_ds_ts(organization_id, opts)
 
 List the DSTs of an organization
 
@@ -323,14 +380,15 @@ opts = {
   where_status: 'performed', # String | Returns the Digital Signature Transactions with the specified status
   where_title: 'Signature of a document', # String | Returns the Digital Signature Transactions that have the specified title
   where_created_by: 'jdo@example', # String | Returns the Digital Signature Transactions created by the specified user
-  where_created: '2019-11-24 12:24:17.430000', # String | Returns the Digital Signature Transactions created before, after or in the declared range
+  where_created: '2019-11-24T12:24:17.430Z', # String | Returns the Digital Signature Transactions created before, after or in the declared range
   where_signature_status: 'pending', # String | Returns the Digital Signature Transactions where at least one of the signers has the queried status
   where_document_name: 'Document of example', # String | Returns the Digital Signature Transactions that have into its documents the queried one
   where_reason: 'where_reason_example', # String | Returns the Digital Signature Transactions with the specified reason
   where_signature_name: 'John Doe', # String | Returns the Digital Signature Transactions where the specified user is a signer, searched by its name
   where_signer_group: '@administrators', # String | Returns the Digital Signature Transactions that have the specified group of signers
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -360,10 +418,11 @@ Name | Type | Description  | Notes
  **where_signer_group** | **String**| Returns the Digital Signature Transactions that have the specified group of signers | [optional] 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2006**](InlineResponse2006.md)
+[**InlineResponse2008**](InlineResponse2008.md)
 
 ### Authorization
 

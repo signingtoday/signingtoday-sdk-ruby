@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 ## create_token
 
-> InlineResponse2014 create_token(organization_id, create_token)
+> InlineResponse2015 create_token(organization_id, create_token)
 
 Create an application token
 
@@ -57,7 +57,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2014**](InlineResponse2014.md)
+[**InlineResponse2015**](InlineResponse2015.md)
 
 ### Authorization
 
@@ -127,7 +127,7 @@ Name | Type | Description  | Notes
 
 ## get_token
 
-> InlineResponse2014 get_token(organization_id, token_id)
+> InlineResponse2015 get_token(organization_id, token_id)
 
 Get information about a token
 
@@ -169,7 +169,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2014**](InlineResponse2014.md)
+[**InlineResponse2015**](InlineResponse2015.md)
 
 ### Authorization
 
@@ -183,7 +183,7 @@ Name | Type | Description  | Notes
 
 ## list_tokens
 
-> InlineResponse20011 list_tokens(organization_id, opts)
+> InlineResponse2004 list_tokens(organization_id, opts)
 
 Enumerate the tokens of an organization
 
@@ -208,7 +208,8 @@ opts = {
   where_user: 'jdo', # String | Returns the tokens of the specified user, searched by its id
   where_label: 'token', # String | Returns the tokens with the specified label
   count: 100, # Integer | Sets the number of tokens per page to display
-  page: 1 # Integer | Restricts the search to chosen page
+  page: 1, # Integer | Restricts the search to chosen page
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -230,10 +231,11 @@ Name | Type | Description  | Notes
  **where_label** | **String**| Returns the tokens with the specified label | [optional] 
  **count** | **Integer**| Sets the number of tokens per page to display | [optional] [default to 100]
  **page** | **Integer**| Restricts the search to chosen page | [optional] 
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse20011**](InlineResponse20011.md)
+[**InlineResponse2004**](InlineResponse2004.md)
 
 ### Authorization
 
@@ -247,7 +249,7 @@ Name | Type | Description  | Notes
 
 ## list_user_tokens
 
-> InlineResponse20011 list_user_tokens(organization_id, user_id, opts)
+> InlineResponse2004 list_user_tokens(organization_id, user_id, opts)
 
 Enumerate the tokens of an user
 
@@ -271,7 +273,8 @@ organization_id = 'api-demo' # String | The **organization-id** represents an or
 user_id = SigningTodayAPIClient::Id.new # Id | The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user 
 opts = {
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -292,10 +295,11 @@ Name | Type | Description  | Notes
  **user_id** | [**Id**](.md)| The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user  | 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse20011**](InlineResponse20011.md)
+[**InlineResponse2004**](InlineResponse2004.md)
 
 ### Authorization
 
@@ -309,7 +313,7 @@ Name | Type | Description  | Notes
 
 ## update_token
 
-> InlineResponse2014 update_token(organization_id, token_id, update_token)
+> InlineResponse2015 update_token(organization_id, token_id, update_token)
 
 Update the properties of a token
 
@@ -353,7 +357,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2014**](InlineResponse2014.md)
+[**InlineResponse2015**](InlineResponse2015.md)
 
 ### Authorization
 

@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**InlineResponse201Data**](InlineResponse201Data.md) |  | [optional] 
 **meta** | [**MetaDataSuccess**](MetaDataSuccess.md) |  | [optional] 
+**data** | [**User**](User.md) |  | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineResponse201.new(data: null,
-                                 meta: null)
+instance = SigningTodayAPIClient::InlineResponse201.new(meta: null,
+                                 data: null)
 ```
 
 

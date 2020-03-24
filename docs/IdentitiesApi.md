@@ -16,13 +16,14 @@ Method | HTTP request | Description
 [**list_identities**](IdentitiesApi.md#list_identities) | **GET** /{organization-id}/identities | Enumerate the identities of an organization
 [**list_user_enrollments**](IdentitiesApi.md#list_user_enrollments) | **GET** /{organization-id}/users/{user-id}/identity-requests | List the enrollments of an user
 [**list_user_identities**](IdentitiesApi.md#list_user_identities) | **GET** /{organization-id}/users/{user-id}/wallet | Enumerate the identities of an user
+[**renew_identity**](IdentitiesApi.md#renew_identity) | **POST** /{organization-id}/identity-requests/{enrollment-id}/renew | Renew an Identity
 [**request_enrollment**](IdentitiesApi.md#request_enrollment) | **POST** /{organization-id}/enroll | Submit an enrollment request
 
 
 
 ## associate_appearance
 
-> InlineResponse2004 associate_appearance(organization_id, identity_id, inline_object)
+> InlineResponse2011 associate_appearance(organization_id, identity_id, inline_object)
 
 Associate an appearance to an identity
 
@@ -66,7 +67,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2004**](InlineResponse2004.md)
+[**InlineResponse2011**](InlineResponse2011.md)
 
 ### Authorization
 
@@ -80,7 +81,7 @@ Name | Type | Description  | Notes
 
 ## associate_identity
 
-> InlineResponse2004 associate_identity(organization_id, user_id, identity_association)
+> InlineResponse2011 associate_identity(organization_id, user_id, identity_association)
 
 Associate to an user an already existing identity
 
@@ -124,7 +125,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2004**](InlineResponse2004.md)
+[**InlineResponse2011**](InlineResponse2011.md)
 
 ### Authorization
 
@@ -194,7 +195,7 @@ Name | Type | Description  | Notes
 
 ## delete_appearance
 
-> InlineResponse2004 delete_appearance(organization_id, identity_id)
+> InlineResponse2011 delete_appearance(organization_id, identity_id)
 
 Delete the appearance of an identity
 
@@ -236,7 +237,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2004**](InlineResponse2004.md)
+[**InlineResponse2011**](InlineResponse2011.md)
 
 ### Authorization
 
@@ -306,7 +307,7 @@ Name | Type | Description  | Notes
 
 ## delete_identity
 
-> InlineResponse2003 delete_identity(organization_id, identity_id)
+> InlineResponse2006 delete_identity(organization_id, identity_id)
 
 Delete an identity
 
@@ -348,7 +349,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2003**](InlineResponse2003.md)
+[**InlineResponse2006**](InlineResponse2006.md)
 
 ### Authorization
 
@@ -362,7 +363,7 @@ Name | Type | Description  | Notes
 
 ## get_enrollment_request
 
-> InlineResponse2011 get_enrollment_request(organization_id, enrollment_id)
+> InlineResponse2007 get_enrollment_request(organization_id, enrollment_id)
 
 Get information about an enrollment request
 
@@ -404,7 +405,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2011**](InlineResponse2011.md)
+[**InlineResponse2007**](InlineResponse2007.md)
 
 ### Authorization
 
@@ -418,7 +419,7 @@ Name | Type | Description  | Notes
 
 ## get_identity
 
-> InlineResponse2002 get_identity(organization_id, identity_id)
+> InlineResponse2005 get_identity(organization_id, identity_id, opts)
 
 Get information about an identity
 
@@ -440,10 +441,13 @@ end
 api_instance = SigningTodayAPIClient::IdentitiesApi.new
 organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
 identity_id = SigningTodayAPIClient::Id.new # Id | The **identity-id** is the uuid code that identifies an identity in the wallet of an user. It is, as well, used to restrict the requested operation to the scope of that identity 
+opts = {
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
+}
 
 begin
   #Get information about an identity
-  result = api_instance.get_identity(organization_id, identity_id)
+  result = api_instance.get_identity(organization_id, identity_id, opts)
   p result
 rescue SigningTodayAPIClient::ApiError => e
   puts "Exception when calling IdentitiesApi->get_identity: #{e}"
@@ -457,10 +461,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **organization_id** | **String**| The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization  | [default to &#39;api-demo&#39;]
  **identity_id** | [**Id**](.md)| The **identity-id** is the uuid code that identifies an identity in the wallet of an user. It is, as well, used to restrict the requested operation to the scope of that identity  | 
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2002**](InlineResponse2002.md)
+[**InlineResponse2005**](InlineResponse2005.md)
 
 ### Authorization
 
@@ -474,7 +479,7 @@ Name | Type | Description  | Notes
 
 ## list_enrollment_requests
 
-> InlineResponse2005 list_enrollment_requests(organization_id, opts)
+> InlineResponse2003 list_enrollment_requests(organization_id, opts)
 
 Enumerate the enrollment requests of an organization
 
@@ -503,7 +508,8 @@ opts = {
   where_registered_by: 'fba', # String | Returns the identity requests registered by this user
   where_fiscal_code: 'MLLSNT82P65Z404U', # String | Returns the identity requests have the specified fiscal code
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -529,10 +535,11 @@ Name | Type | Description  | Notes
  **where_fiscal_code** | **String**| Returns the identity requests have the specified fiscal code | [optional] 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2005**](InlineResponse2005.md)
+[**InlineResponse2003**](InlineResponse2003.md)
 
 ### Authorization
 
@@ -546,7 +553,7 @@ Name | Type | Description  | Notes
 
 ## list_identities
 
-> InlineResponse2001 list_identities(organization_id, opts)
+> InlineResponse2002 list_identities(organization_id, opts)
 
 Enumerate the identities of an organization
 
@@ -575,7 +582,8 @@ opts = {
   where_registered_by: 'fba', # String | Returns the identities registered by this user
   where_fiscal_code: 'MLLSNT82P65Z404U', # String | Returns the identities that have the specified fiscal code
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -601,10 +609,11 @@ Name | Type | Description  | Notes
  **where_fiscal_code** | **String**| Returns the identities that have the specified fiscal code | [optional] 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**InlineResponse2002**](InlineResponse2002.md)
 
 ### Authorization
 
@@ -618,7 +627,7 @@ Name | Type | Description  | Notes
 
 ## list_user_enrollments
 
-> InlineResponse2005 list_user_enrollments(organization_id, user_id, opts)
+> InlineResponse2003 list_user_enrollments(organization_id, user_id, opts)
 
 List the enrollments of an user
 
@@ -642,7 +651,8 @@ organization_id = 'api-demo' # String | The **organization-id** represents an or
 user_id = SigningTodayAPIClient::Id.new # Id | The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user 
 opts = {
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -663,10 +673,11 @@ Name | Type | Description  | Notes
  **user_id** | [**Id**](.md)| The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user  | 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2005**](InlineResponse2005.md)
+[**InlineResponse2003**](InlineResponse2003.md)
 
 ### Authorization
 
@@ -680,7 +691,7 @@ Name | Type | Description  | Notes
 
 ## list_user_identities
 
-> InlineResponse2001 list_user_identities(organization_id, user_id, opts)
+> InlineResponse2002 list_user_identities(organization_id, user_id, opts)
 
 Enumerate the identities of an user
 
@@ -704,7 +715,8 @@ organization_id = 'api-demo' # String | The **organization-id** represents an or
 user_id = SigningTodayAPIClient::Id.new # Id | The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user 
 opts = {
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -725,10 +737,11 @@ Name | Type | Description  | Notes
  **user_id** | [**Id**](.md)| The **user-id** is the uuid code that identifies a user of an organization. It is used as a path parameter to restrict the requested operation to the scope of that user  | 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**InlineResponse2002**](InlineResponse2002.md)
 
 ### Authorization
 
@@ -740,9 +753,67 @@ Name | Type | Description  | Notes
 - **Accept**: application/json
 
 
+## renew_identity
+
+> InlineResponse2007 renew_identity(organization_id, enrollment_id, inline_object1)
+
+Renew an Identity
+
+This API allows to renew an Identity of a user. 
+
+### Example
+
+```ruby
+# load the gem
+require 'signing_today_client'
+# setup authorization
+SigningTodayAPIClient.configure do |config|
+  # Configure API key authorization: ApiKeyAuth
+  config.api_key['Authorization'] = 'YOUR API KEY'
+  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
+  #config.api_key_prefix['Authorization'] = 'Bearer'
+end
+
+api_instance = SigningTodayAPIClient::IdentitiesApi.new
+organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
+enrollment_id = SigningTodayAPIClient::Id.new # Id | The **enrollment-id** is the uuid code that identifies a specific enrollment request 
+inline_object1 = SigningTodayAPIClient::InlineObject1.new # InlineObject1 | 
+
+begin
+  #Renew an Identity
+  result = api_instance.renew_identity(organization_id, enrollment_id, inline_object1)
+  p result
+rescue SigningTodayAPIClient::ApiError => e
+  puts "Exception when calling IdentitiesApi->renew_identity: #{e}"
+end
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **organization_id** | **String**| The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization  | [default to &#39;api-demo&#39;]
+ **enrollment_id** | [**Id**](.md)| The **enrollment-id** is the uuid code that identifies a specific enrollment request  | 
+ **inline_object1** | [**InlineObject1**](InlineObject1.md)|  | 
+
+### Return type
+
+[**InlineResponse2007**](InlineResponse2007.md)
+
+### Authorization
+
+[ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
 ## request_enrollment
 
-> InlineResponse2011 request_enrollment(organization_id, identity_request)
+> InlineResponse2007 request_enrollment(organization_id, identity_request)
 
 Submit an enrollment request
 
@@ -784,7 +855,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2011**](InlineResponse2011.md)
+[**InlineResponse2007**](InlineResponse2007.md)
 
 ### Authorization
 

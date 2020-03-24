@@ -14,7 +14,7 @@ Method | HTTP request | Description
 
 ## create_channel
 
-> InlineResponse201 create_channel(organization_id, dst_id)
+> InlineResponse2014 create_channel(organization_id, dst_id)
 
 Create a channel
 
@@ -56,7 +56,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse201**](InlineResponse201.md)
+[**InlineResponse2014**](InlineResponse2014.md)
 
 ### Authorization
 
@@ -70,7 +70,7 @@ Name | Type | Description  | Notes
 
 ## decline_dst
 
-> InlineResponse2013 decline_dst(organization_id, signature_id, inline_object2)
+> InlineResponse2013 decline_dst(organization_id, signature_id, inline_object5)
 
 Decline a Digital Signature Transaction
 
@@ -92,11 +92,11 @@ end
 api_instance = SigningTodayAPIClient::SignaturesApi.new
 organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
 signature_id = SigningTodayAPIClient::Id.new # Id | The **signature-id** is the uuid code that identifies a signature that has to be performed into a digital signature transaction. It is usually used in the API endpoints to perform, decline or cancel a digital signature transaction 
-inline_object2 = SigningTodayAPIClient::InlineObject2.new # InlineObject2 | 
+inline_object5 = SigningTodayAPIClient::InlineObject5.new # InlineObject5 | 
 
 begin
   #Decline a Digital Signature Transaction
-  result = api_instance.decline_dst(organization_id, signature_id, inline_object2)
+  result = api_instance.decline_dst(organization_id, signature_id, inline_object5)
   p result
 rescue SigningTodayAPIClient::ApiError => e
   puts "Exception when calling SignaturesApi->decline_dst: #{e}"
@@ -110,7 +110,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **organization_id** | **String**| The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization  | [default to &#39;api-demo&#39;]
  **signature_id** | [**Id**](.md)| The **signature-id** is the uuid code that identifies a signature that has to be performed into a digital signature transaction. It is usually used in the API endpoints to perform, decline or cancel a digital signature transaction  | 
- **inline_object2** | [**InlineObject2**](InlineObject2.md)|  | 
+ **inline_object5** | [**InlineObject5**](InlineObject5.md)|  | 
 
 ### Return type
 
@@ -128,7 +128,7 @@ Name | Type | Description  | Notes
 
 ## perform_dst
 
-> InlineResponse2008 perform_dst(organization_id, signature_id, automatic_signature)
+> InlineResponse20011 perform_dst(organization_id, signature_id, automatic_signature)
 
 Sign a DST with an automatic signer
 
@@ -172,7 +172,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2008**](InlineResponse2008.md)
+[**InlineResponse20011**](InlineResponse20011.md)
 
 ### Authorization
 
@@ -186,7 +186,7 @@ Name | Type | Description  | Notes
 
 ## perform_signature
 
-> InlineResponse2009 perform_signature(organization_id, signature_id, identity_id, inline_object3)
+> InlineResponse20012 perform_signature(organization_id, signature_id, identity_id, inline_object3)
 
 Perform a Signature
 
@@ -232,7 +232,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2009**](InlineResponse2009.md)
+[**InlineResponse20012**](InlineResponse20012.md)
 
 ### Authorization
 
@@ -246,7 +246,7 @@ Name | Type | Description  | Notes
 
 ## perform_signature_with_session
 
-> InlineResponse20010 perform_signature_with_session(organization_id, signature_id, inline_object4)
+> InlineResponse20013 perform_signature_with_session(organization_id, signature_id, inline_object4)
 
 Perform a Signature with session
 
@@ -290,7 +290,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20010**](InlineResponse20010.md)
+[**InlineResponse20013**](InlineResponse20013.md)
 
 ### Authorization
 

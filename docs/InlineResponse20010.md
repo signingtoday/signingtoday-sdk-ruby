@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**InlineResponse20010Data**](InlineResponse20010Data.md) |  | [optional] 
-**meta** | [**MetaDataSuccess**](MetaDataSuccess.md) |  | [optional] 
+**meta** | [**InlineResponse2009Meta**](InlineResponse2009Meta.md) |  | [optional] 
+**data** | [**SignatureTransaction**](SignatureTransaction.md) |  | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineResponse20010.new(data: null,
-                                 meta: null)
+instance = SigningTodayAPIClient::InlineResponse20010.new(meta: null,
+                                 data: null)
 ```
 
 

@@ -4,18 +4,18 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data** | [**Identity**](Identity.md) |  | [optional] 
-**meta** | [**MetaDataSuccess**](MetaDataSuccess.md) |  | [optional] 
 **pagination** | [**PaginationData**](PaginationData.md) |  | [optional] 
+**meta** | [**MetaDataSuccess**](MetaDataSuccess.md) |  | [optional] 
+**data** | [**Array&lt;Identity&gt;**](Identity.md) |  | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineResponse2002.new(data: null,
+instance = SigningTodayAPIClient::InlineResponse2002.new(pagination: null,
                                  meta: null,
-                                 pagination: null)
+                                 data: null)
 ```
 
 

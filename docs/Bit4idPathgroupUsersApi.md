@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 ## create_user
 
-> InlineResponse2015 create_user(organization_id, create_user)
+> InlineResponse201 create_user(organization_id, create_user)
 
 Create a user of the organization
 
@@ -55,7 +55,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2015**](InlineResponse2015.md)
+[**InlineResponse201**](InlineResponse201.md)
 
 ### Authorization
 
@@ -69,7 +69,7 @@ Name | Type | Description  | Notes
 
 ## get_user
 
-> InlineResponse2015 get_user(organization_id, user_id)
+> InlineResponse201 get_user(organization_id, user_id)
 
 Get information about an user
 
@@ -111,7 +111,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2015**](InlineResponse2015.md)
+[**InlineResponse201**](InlineResponse201.md)
 
 ### Authorization
 
@@ -125,7 +125,7 @@ Name | Type | Description  | Notes
 
 ## list_users
 
-> InlineResponse20012 list_users(organization_id, opts)
+> InlineResponse2001 list_users(organization_id, opts)
 
 Enumerate the users of an organization
 
@@ -151,8 +151,11 @@ opts = {
   where_email: 'test@mail.com', # String | Returns the users that have the specified email
   where_last_name: 'Doe', # String | Returns the users that have the specified last name
   where_first_name: 'John', # String | Returns the users that have the specified first name
+  where_automatic: false, # Boolean | If set up to **true** returns automatic users only, otherwise returns non automatic users only
+  where_rao: false, # Boolean | If set up to **true** returns rao users only, otherwise returns non rao users only
   page: 1, # Integer | Restricts the search to the chosen page
-  count: 100 # Integer | Sets the number of users per page to display
+  count: 100, # Integer | Sets the number of users per page to display
+  where_order: 'where_first_name' # String | The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \"**-**\" in front of the value indicates descending order), then the second value and so on
 }
 
 begin
@@ -174,12 +177,15 @@ Name | Type | Description  | Notes
  **where_email** | **String**| Returns the users that have the specified email | [optional] 
  **where_last_name** | **String**| Returns the users that have the specified last name | [optional] 
  **where_first_name** | **String**| Returns the users that have the specified first name | [optional] 
+ **where_automatic** | **Boolean**| If set up to **true** returns automatic users only, otherwise returns non automatic users only | [optional] 
+ **where_rao** | **Boolean**| If set up to **true** returns rao users only, otherwise returns non rao users only | [optional] 
  **page** | **Integer**| Restricts the search to the chosen page | [optional] 
  **count** | **Integer**| Sets the number of users per page to display | [optional] [default to 100]
+ **where_order** | **String**| The **where_order** query parameter takes one or more values separated by a comma and a space. The result will be ordered by the first value (ascending order is implied; a \&quot;**-**\&quot; in front of the value indicates descending order), then the second value and so on | [optional] 
 
 ### Return type
 
-[**InlineResponse20012**](InlineResponse20012.md)
+[**InlineResponse2001**](InlineResponse2001.md)
 
 ### Authorization
 
@@ -193,7 +199,7 @@ Name | Type | Description  | Notes
 
 ## update_user
 
-> InlineResponse2015 update_user(organization_id, user_id, update_user)
+> InlineResponse201 update_user(organization_id, user_id, update_user)
 
 Edit one or more user properties
 
@@ -237,7 +243,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2015**](InlineResponse2015.md)
+[**InlineResponse201**](InlineResponse201.md)
 
 ### Authorization
 
