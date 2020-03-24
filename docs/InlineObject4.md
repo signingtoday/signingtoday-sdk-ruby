@@ -4,16 +4,16 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**identity_id** | [**Id**](Id.md) |  | [optional] 
-**session_id** | **String** | This is the id of the session is going to use in order the perform the signature or the signatures | [optional] 
+**current_password** | **String** | The current password of the user | [optional] 
+**new_password** | **String** | The new password choosen | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineObject4.new(identity_id: null,
-                                 session_id: fb2e77d.47a0479900504cb3ab4a1f626d174d2d)
+instance = SigningTodayAPIClient::InlineObject4.new(current_password: a12345678Z,
+                                 new_password: 0abcdefgH9)
 ```
 
 

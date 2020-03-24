@@ -1,471 +1,323 @@
 # signing_today_client
-SigningTodayAPIClient - the Ruby gem for the Signing Today API
-*Signing Today* enables seamless integration of digital signatures into any
-website by the use of easy requests to our API. This is the smart way of
-adding digital signature support with a great user experience.
 
+SigningTodayAPIClient - the Ruby gem for the Signing Today Web
 
-*Signing Today APIs* use HTTP methods and are RESTful based, moreover they
-are protected by a *server to server authentication* standard by the use of
-tokens.
-
-
-*Signing Today APIs* can be used in these environments:
-
-
-| Environment | Description | Endpoint |
-| ----------- | ----------- | -------- |
-| Sandbox     | Test environment | `https://sandbox.signingtoday.com` |
-| Live        | Production environment | `https://api.signingtoday.com` |
-
-
-For every single request to Signing Today has to be defined the following
-*HTTP* header:
-- `Authorization`, which contains the authentication token.
-
-If the request has a body than another *HTTP* header is requested:
-- `Content-Type`, with `application/json` value.
-
-
-Follows an example of usage to enumerate all the user of *my-org*
-organization.
-
-**Example**
-
-```json
-$ curl https://sandbox.signingtoday.com/api/v1/my-org/users \
-    -H 'Authorization: Token <access-token>'
-```
-
-## HTTP methods used
-
-APIs use the right HTTP verb in every situation.
-
-| Method   | Description                    |
-| -------- | ------------------------------ |
-| `GET`    | Request data from a resource   |
-| `POST`   | Send data to create a resource |
-| `PUT`    | Update a resource              |
-| `PATCH`  | Partially update a resource    |
-| `DELETE` | Delete a resourse              |
-
-
-## Response definition
-
-All the response are in JSON format.
-As response to a request of all users of an organization you will have a
-result like this:
-
-```json
-{
-    "pagination": {
-      "count": 75,
-      "previous": "https://sandbox.signingtoday.com/api/v1/my-org/users?page=1",
-      "next": "https://sandbox.signingtoday.com/api/v1/my-org/users?page=3",
-      "pages": 8,
-      "page": 2
-    },
-    "meta": {
-      "code": 200
-    },
-    "data": [
-      {
-        "id": "jdo",
-        "status": "enabled",
-        "type": "Basic user account",
-        "email": johndoe@dummyemail.com,
-        "first_name": "John",
-        "last_name": "Doe",
-        "wallet": [],
-        "created_by": "system",
-        "owner": false,
-        "automatic": false,
-        "rao": false
-      },
-      ...
-    ]
-  }
-```
-
-The JSON of the response is made of three parts:
-- Pagination
-- Meta
-- Data
-
-### Pagination
-
-*Pagination* object allows to split the response into parts and then to
-rebuild it sequentially by the use of `next` and `previous` parameters, by
-which you get previous and following blocks. The *Pagination* is present
-only if the response is a list of objects.
-
-The general structure of *Pagination* object is the following:
-
-```json
-{
-    "pagination": {
-      "count": 75,
-      "previous": "https://sandbox.signingtoday.com/api/v1/my-org/users?page=1",
-      "next": "https://sandbox.signingtoday.com/api/v1/my-org/users?page=3",
-      "pages": 8,
-      "page": 2
-    },
-    ...
-  }
-```
-
-### Meta
-
-*Meta* object is used to enrich the information about the response. In the
-previous example, a successful case of response, *Meta* will have value
-`status: 2XX`. In case of unsuccessful response, *Meta* will have further
-information, as follows:
-
-```json
-{
-    "meta": {
-      "code": <HTTP STATUS CODE>,
-      "error_type": <STATUS CODE DESCRIPTION>,
-      "error_message": <ERROR DESCRIPTION>
-    }
-  }
-```
-
-### Data
-
-*Data* object outputs as object or list of them. Contains the expected data
-as requested to the API.
-
-## Search filters
-
-Search filters of the API have the following structure:
-
-`where_ATTRIBUTENAME`=`VALUE`
-
-In this way you make a case-sensitive search of *VALUE*. You can extend it
-through the Django lookup, obtaining more specific filters. For example:
-
-`where_ATTRIBUTENAME__LOOKUP`=`VALUE`
-
-where *LOOKUP* can be replaced with `icontains` to have a partial insensitive
-research, where
-
-`where_first_name__icontains`=`CHa`
-
-matches with every user that have the *cha* string in their name, with
-no differences between capital and lower cases.
-
-[Here](https://docs.djangoproject.com/en/1.11/ref/models/querysets/#field-lookups)
-the list of the lookups.
-
-## Webhooks
-
-Signing Today supports webhooks for the update of DSTs and identities status.
-You can choose if to use or not webhooks and if you want to receive updates
-about DSTs and/or identities. You can configurate it on application token
-level, in the *webhook* field, as follows:
-
-```json
-"webhooks": {
-  "dst": "URL",
-  "identity": "URL"
-  }
-```
-
-### DSTs status update
-
-DSTs send the following status updates:
-- **DST_STATUS_CHANGED**: whenever the DST changes its status
-- **SIGNATURE_STATUS_CHANGED**: whenever one of the signatures changes its
-status
-
-#### DST_STATUS_CHANGED
-
-Sends the following information:
-
-```json
-{
-    "message": "DST_STATUS_CHANGED",
-    "data": {
-      "status": "<DST_STATUS>",
-      "dst": "<DST_ID>",
-      "reason": "<DST_REASON>"
-    }
-  }
-```
-
-#### SIGNATURE_STATUS_CHANGED
-
-Sends the following information:
-
-```json
-{
-    "message": "SIGNATURE_STATUS_CHANGED",
-    "data": {
-      "status": "<SIGNATURE_STATUS>",
-      "group": <MEMBERSHIP_GROUP_INDEX>,
-      "dst": {
-        "id": "<DST_ID>",
-        "title": "<DST_TITLE>"
-      },
-      "signature": "<SIGNATURE_ID>",
-      "signer": "<SIGNER_USERNAME>",
-      "position": "<SIGNATURE_POSITION>",
-      "document": {
-        "display_name": "<DOCUMENT_TITLE>",
-        "id": "<DOCUMENT_ID>",
-        "order": <DOCUMENT_INDEX>
-      },
-      "automatic": <DECLARES_IF_THE_SIGNER_IS_AUTOMATIC>,
-      "page": "<SIGNATURE_PAGE>"
-    }
-  }
-```
-
-### Identities status update
-
-Identities send the following status updates:
-- **IDENTITY_REQUEST_ENROLLED**: whenever an identity request is activated
-
-#### IDENTITY_REQUEST_ENROLLED
-
-Sends the following information:
-
-```json
-{
-    "message": "IDENTITY_REQUEST_ENROLLED",
-    "data": {
-      "status": "<REQUEST_STATUS>",
-      "request": "<REQUEST_ID>",
-      "user": "<APPLICANT_USERNAME>"
-    }
-  }
-```
-
-### Urlback
-
-Sometimes may be necessary to make a redirect after an user, from the
-signature tray, has completed his operations or activated a certificate.
-
-If set, redirects could happen in 3 cases:
-- after a signature or decline
-- after a DST has been signed by all the signers or canceled
-- after the activation of a certificate
-
-In the first two cases the urlback returns the following information through
-a data form:
-- **dst-id**: id of the DST
-- **dst-url**: signature_ticket of the signature
-- **dst-status**: current status of the DST
-- **dst-signature-id**: id of the signature
-- **dst-signature-status**: current status of the signature
-- **user**: username of the signer
-- **decline-reason**: in case of a refused DST contains the reason of the
-decline
-
-In the last case the urlback returns the following information through a
-data form:
-- **user**: username of the user activated the certificate
-- **identity-provider**: the provider has been used to issue the certificate
-- **identity-request-id**: id of the enrollment request
-- **identity-id**: id of the new identity
-- **identity-label**: the label assigned to the identity
-- **identity-certificate**: public key of the certificate
+*Signing Today* is the perfect Digital Signature Gateway. Whenever in Your
+workflow You need to add one or more Digital Signatures to Your
+document, *Signing Today* is the right choice. You prepare Your documents,
+*Signing Today* takes care of all the rest: send invitations
+(`signature tickets`) to signers, collects their signatures, send You
+back the signed document.
+Integrating *Signing Today* in Your existing applications is very easy.
+Just follow these API specifications and get inspired by the many
+examples presented hereafter.
 
 
 This SDK is automatically generated by the [OpenAPI Generator](https://openapi-generator.tech) project:
-- API version: 1.5.0
+
+- API version: 2.0.0
 - Package version: 1.0.0
 - Build package: org.openapitools.codegen.languages.RubyClientCodegen
-For more information, please visit [https://signing.today/contacts/](https://signing.today/contacts/)
+
 ## Installation
+
 ### Build a gem
+
 To build the Ruby code into a gem:
+
 ```shell
 gem build signing_today_client.gemspec
 ```
+
 Then either install the gem locally:
+
 ```shell
 gem install ./signing_today_client-1.0.0.gem
 ```
+
 (for development, run `gem install --dev ./signing_today_client-1.0.0.gem` to install the development dependencies)
+
 or publish the gem to a gem hosting service, e.g. [RubyGems](https://rubygems.org/).
+
 Finally add this to the Gemfile:
+
     gem 'signing_today_client', '~> 1.0.0'
+
 ### Install from Git
+
 If the Ruby gem is hosted at a git repository: https://github.com/GIT_USER_ID/GIT_REPO_ID, then add the following in the Gemfile:
+
     gem 'signing_today_client', :git => 'https://github.com/GIT_USER_ID/GIT_REPO_ID.git'
+
 ### Include the Ruby code directly
+
 Include the Ruby code directly using `-I` as follows:
+
 ```shell
 ruby -Ilib script.rb
 ```
+
 ## Getting Started
+
 Please follow the [installation](#installation) procedure and then run the following code:
+
 ```ruby
 # Load the gem
 require 'signing_today_client'
+
 # Setup authorization
 SigningTodayAPIClient.configure do |config|
-  # Configure API key authorization: ApiKeyAuth
-  config.api_key['Authorization'] = 'YOUR API KEY'
-  # Uncomment the following line to set a prefix for the API key, e.g. 'Bearer' (defaults to nil)
-  #config.api_key_prefix['Authorization'] = 'Bearer'
+  # Configure OAuth2 access token for authorization: OAuth2
+  config.access_token = 'YOUR ACCESS TOKEN'
 end
-api_instance = SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi.new
-organization_id = 'api-demo' # String | The **organization-id** represents an organization that is included in the SigninToday application, also know as **slug** and it is used as a path parameter to restrict the asked functionality to the specified organization 
-identity_id = SigningTodayAPIClient::Id.new # Id | The **identity-id** is the uuid code that identifies an identity in the wallet of an user. It is, as well, used to restrict the requested operation to the scope of that identity 
-inline_object = SigningTodayAPIClient::InlineObject.new # InlineObject | 
+
+api_instance = SigningTodayAPIClient::BackofficeApi.new
+id = 'test_id' # String | The value of the unique id
+
 begin
-  #Associate an appearance to an identity
-  result = api_instance.associate_appearance(organization_id, identity_id, inline_object)
+  #Sync all completed DSTs on Alfresco
+  result = api_instance.organization_id_alfresco_sync_get(id)
   p result
 rescue SigningTodayAPIClient::ApiError => e
-  puts "Exception when calling Bit4idPathgroupIdentitiesApi->associate_appearance: #{e}"
+  puts "Exception when calling BackofficeApi->organization_id_alfresco_sync_get: #{e}"
 end
+
 ```
+
 ## Documentation for API Endpoints
-All URIs are relative to *https://sandbox.signingtoday.com/api/v1*
+
+All URIs are relative to *https://web.sandbox.signingtoday.com/api*
+
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**associate_appearance**](docs/Bit4idPathgroupIdentitiesApi.md#associate_appearance) | **POST** /{organization-id}/identities/{identity-id}/appearance | Associate an appearance to an identity
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**associate_identity**](docs/Bit4idPathgroupIdentitiesApi.md#associate_identity) | **POST** /{organization-id}/users/{user-id}/wallet | Associate to an user an already existing identity
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**create_token_from_identity**](docs/Bit4idPathgroupIdentitiesApi.md#create_token_from_identity) | **POST** /{organization-id}/identities/create/token | Create an identity from token
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**delete_appearance**](docs/Bit4idPathgroupIdentitiesApi.md#delete_appearance) | **DELETE** /{organization-id}/identities/{identity-id}/appearance | Delete the appearance of an identity
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**delete_enrollment_request**](docs/Bit4idPathgroupIdentitiesApi.md#delete_enrollment_request) | **DELETE** /{organization-id}/identity-requests/{enrollment-id} | Delete an enrollment request
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**delete_identity**](docs/Bit4idPathgroupIdentitiesApi.md#delete_identity) | **DELETE** /{organization-id}/identities/{identity-id} | Delete an identity
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**get_enrollment_request**](docs/Bit4idPathgroupIdentitiesApi.md#get_enrollment_request) | **GET** /{organization-id}/identity-requests/{enrollment-id} | Get information about an enrollment request
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**get_identity**](docs/Bit4idPathgroupIdentitiesApi.md#get_identity) | **GET** /{organization-id}/identities/{identity-id} | Get information about an identity
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**list_enrollment_requests**](docs/Bit4idPathgroupIdentitiesApi.md#list_enrollment_requests) | **GET** /{organization-id}/identity-requests | Enumerate the enrollment requests of an organization
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**list_identities**](docs/Bit4idPathgroupIdentitiesApi.md#list_identities) | **GET** /{organization-id}/identities | Enumerate the identities of an organization
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**list_user_enrollments**](docs/Bit4idPathgroupIdentitiesApi.md#list_user_enrollments) | **GET** /{organization-id}/users/{user-id}/identity-requests | List the enrollments of an user
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**list_user_identities**](docs/Bit4idPathgroupIdentitiesApi.md#list_user_identities) | **GET** /{organization-id}/users/{user-id}/wallet | Enumerate the identities of an user
-*SigningTodayAPIClient::Bit4idPathgroupIdentitiesApi* | [**request_enrollment**](docs/Bit4idPathgroupIdentitiesApi.md#request_enrollment) | **POST** /{organization-id}/enroll | Submit an enrollment request
-*SigningTodayAPIClient::Bit4idPathgroupOrganizationsApi* | [**get_organization**](docs/Bit4idPathgroupOrganizationsApi.md#get_organization) | **GET** /organizations/{organization-id} | Get the settings of an oraganization
-*SigningTodayAPIClient::Bit4idPathgroupOrganizationsApi* | [**patch_organization**](docs/Bit4idPathgroupOrganizationsApi.md#patch_organization) | **PATCH** /organizations/{organization-id} | Edit the settings of an organization
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**cancel_dst**](docs/Bit4idPathgroupSignatureTransactionsApi.md#cancel_dst) | **POST** /{organization-id}/signature-transactions/{dst-id}/cancel | Mark a DST as canceled
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**create_dst**](docs/Bit4idPathgroupSignatureTransactionsApi.md#create_dst) | **POST** /{organization-id}/signature-transactions | Create a Digital Signature Transaction
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**delete_dst**](docs/Bit4idPathgroupSignatureTransactionsApi.md#delete_dst) | **DELETE** /{organization-id}/signature-transactions/{dst-id} | Delete a Digital Signature Transaction
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**get_document**](docs/Bit4idPathgroupSignatureTransactionsApi.md#get_document) | **GET** /{organization-id}/documents/{document-id}/download | Download a document from a DST
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**get_dst**](docs/Bit4idPathgroupSignatureTransactionsApi.md#get_dst) | **GET** /{organization-id}/signature-transactions/{dst-id} | Get information about a DST
-*SigningTodayAPIClient::Bit4idPathgroupSignatureTransactionsApi* | [**list_ds_ts**](docs/Bit4idPathgroupSignatureTransactionsApi.md#list_ds_ts) | **GET** /{organization-id}/signature-transactions | List the DSTs of an organization
-*SigningTodayAPIClient::Bit4idPathgroupSignaturesApi* | [**create_channel**](docs/Bit4idPathgroupSignaturesApi.md#create_channel) | **POST** /{organization-id}/channels/{dst-id} | Create a channel
-*SigningTodayAPIClient::Bit4idPathgroupSignaturesApi* | [**decline_dst**](docs/Bit4idPathgroupSignaturesApi.md#decline_dst) | **POST** /{organization-id}/signatures/{signature-id}/decline | Decline a Digital Signature Transaction
-*SigningTodayAPIClient::Bit4idPathgroupSignaturesApi* | [**perform_dst**](docs/Bit4idPathgroupSignaturesApi.md#perform_dst) | **POST** /{organization-id}/signatures/{signature-id}/perform | Sign a DST with an automatic signer
-*SigningTodayAPIClient::Bit4idPathgroupSignaturesApi* | [**perform_signature**](docs/Bit4idPathgroupSignaturesApi.md#perform_signature) | **POST** /{organization-id}/signatures/{signature-id}/perform/{identity-id} | Perform a Signature
-*SigningTodayAPIClient::Bit4idPathgroupSignaturesApi* | [**perform_signature_with_session**](docs/Bit4idPathgroupSignaturesApi.md#perform_signature_with_session) | **POST** /{organization-id}/signatures/{signature-id}/session-perform | Perform a Signature with session
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**create_token**](docs/Bit4idPathgroupTokensApi.md#create_token) | **POST** /{organization-id}/tokens | Create an application token
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**delete_token**](docs/Bit4idPathgroupTokensApi.md#delete_token) | **DELETE** /{organization-id}/tokens/{token-id} | Delete a token of the organization
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**get_token**](docs/Bit4idPathgroupTokensApi.md#get_token) | **GET** /{organization-id}/tokens/{token-id} | Get information about a token
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**list_tokens**](docs/Bit4idPathgroupTokensApi.md#list_tokens) | **GET** /{organization-id}/tokens | Enumerate the tokens of an organization
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**list_user_tokens**](docs/Bit4idPathgroupTokensApi.md#list_user_tokens) | **GET** /{organization-id}/users/{user-id}/tokens | Enumerate the tokens of an user
-*SigningTodayAPIClient::Bit4idPathgroupTokensApi* | [**update_token**](docs/Bit4idPathgroupTokensApi.md#update_token) | **PUT** /{organization-id}/tokens/{token-id} | Update the properties of a token
-*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**create_user**](docs/Bit4idPathgroupUsersApi.md#create_user) | **POST** /{organization-id}/users | Create a user of the organization
-*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**get_user**](docs/Bit4idPathgroupUsersApi.md#get_user) | **GET** /{organization-id}/users/{user-id} | Get information about an user
-*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**list_users**](docs/Bit4idPathgroupUsersApi.md#list_users) | **GET** /{organization-id}/users | Enumerate the users of an organization
-*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**update_user**](docs/Bit4idPathgroupUsersApi.md#update_user) | **PUT** /{organization-id}/users/{user-id} | Edit one or more user properties
-*SigningTodayAPIClient::IdentitiesApi* | [**associate_appearance**](docs/IdentitiesApi.md#associate_appearance) | **POST** /{organization-id}/identities/{identity-id}/appearance | Associate an appearance to an identity
-*SigningTodayAPIClient::IdentitiesApi* | [**associate_identity**](docs/IdentitiesApi.md#associate_identity) | **POST** /{organization-id}/users/{user-id}/wallet | Associate to an user an already existing identity
-*SigningTodayAPIClient::IdentitiesApi* | [**create_token_from_identity**](docs/IdentitiesApi.md#create_token_from_identity) | **POST** /{organization-id}/identities/create/token | Create an identity from token
-*SigningTodayAPIClient::IdentitiesApi* | [**delete_appearance**](docs/IdentitiesApi.md#delete_appearance) | **DELETE** /{organization-id}/identities/{identity-id}/appearance | Delete the appearance of an identity
-*SigningTodayAPIClient::IdentitiesApi* | [**delete_enrollment_request**](docs/IdentitiesApi.md#delete_enrollment_request) | **DELETE** /{organization-id}/identity-requests/{enrollment-id} | Delete an enrollment request
-*SigningTodayAPIClient::IdentitiesApi* | [**delete_identity**](docs/IdentitiesApi.md#delete_identity) | **DELETE** /{organization-id}/identities/{identity-id} | Delete an identity
-*SigningTodayAPIClient::IdentitiesApi* | [**get_enrollment_request**](docs/IdentitiesApi.md#get_enrollment_request) | **GET** /{organization-id}/identity-requests/{enrollment-id} | Get information about an enrollment request
-*SigningTodayAPIClient::IdentitiesApi* | [**get_identity**](docs/IdentitiesApi.md#get_identity) | **GET** /{organization-id}/identities/{identity-id} | Get information about an identity
-*SigningTodayAPIClient::IdentitiesApi* | [**list_enrollment_requests**](docs/IdentitiesApi.md#list_enrollment_requests) | **GET** /{organization-id}/identity-requests | Enumerate the enrollment requests of an organization
-*SigningTodayAPIClient::IdentitiesApi* | [**list_identities**](docs/IdentitiesApi.md#list_identities) | **GET** /{organization-id}/identities | Enumerate the identities of an organization
-*SigningTodayAPIClient::IdentitiesApi* | [**list_user_enrollments**](docs/IdentitiesApi.md#list_user_enrollments) | **GET** /{organization-id}/users/{user-id}/identity-requests | List the enrollments of an user
-*SigningTodayAPIClient::IdentitiesApi* | [**list_user_identities**](docs/IdentitiesApi.md#list_user_identities) | **GET** /{organization-id}/users/{user-id}/wallet | Enumerate the identities of an user
-*SigningTodayAPIClient::IdentitiesApi* | [**request_enrollment**](docs/IdentitiesApi.md#request_enrollment) | **POST** /{organization-id}/enroll | Submit an enrollment request
-*SigningTodayAPIClient::OrganizationsApi* | [**get_organization**](docs/OrganizationsApi.md#get_organization) | **GET** /organizations/{organization-id} | Get the settings of an oraganization
-*SigningTodayAPIClient::OrganizationsApi* | [**patch_organization**](docs/OrganizationsApi.md#patch_organization) | **PATCH** /organizations/{organization-id} | Edit the settings of an organization
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**cancel_dst**](docs/SignatureTransactionsApi.md#cancel_dst) | **POST** /{organization-id}/signature-transactions/{dst-id}/cancel | Mark a DST as canceled
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**create_dst**](docs/SignatureTransactionsApi.md#create_dst) | **POST** /{organization-id}/signature-transactions | Create a Digital Signature Transaction
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**delete_dst**](docs/SignatureTransactionsApi.md#delete_dst) | **DELETE** /{organization-id}/signature-transactions/{dst-id} | Delete a Digital Signature Transaction
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**get_document**](docs/SignatureTransactionsApi.md#get_document) | **GET** /{organization-id}/documents/{document-id}/download | Download a document from a DST
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**get_dst**](docs/SignatureTransactionsApi.md#get_dst) | **GET** /{organization-id}/signature-transactions/{dst-id} | Get information about a DST
-*SigningTodayAPIClient::SignatureTransactionsApi* | [**list_ds_ts**](docs/SignatureTransactionsApi.md#list_ds_ts) | **GET** /{organization-id}/signature-transactions | List the DSTs of an organization
-*SigningTodayAPIClient::SignaturesApi* | [**create_channel**](docs/SignaturesApi.md#create_channel) | **POST** /{organization-id}/channels/{dst-id} | Create a channel
-*SigningTodayAPIClient::SignaturesApi* | [**decline_dst**](docs/SignaturesApi.md#decline_dst) | **POST** /{organization-id}/signatures/{signature-id}/decline | Decline a Digital Signature Transaction
-*SigningTodayAPIClient::SignaturesApi* | [**perform_dst**](docs/SignaturesApi.md#perform_dst) | **POST** /{organization-id}/signatures/{signature-id}/perform | Sign a DST with an automatic signer
-*SigningTodayAPIClient::SignaturesApi* | [**perform_signature**](docs/SignaturesApi.md#perform_signature) | **POST** /{organization-id}/signatures/{signature-id}/perform/{identity-id} | Perform a Signature
-*SigningTodayAPIClient::SignaturesApi* | [**perform_signature_with_session**](docs/SignaturesApi.md#perform_signature_with_session) | **POST** /{organization-id}/signatures/{signature-id}/session-perform | Perform a Signature with session
-*SigningTodayAPIClient::TokensApi* | [**create_token**](docs/TokensApi.md#create_token) | **POST** /{organization-id}/tokens | Create an application token
-*SigningTodayAPIClient::TokensApi* | [**delete_token**](docs/TokensApi.md#delete_token) | **DELETE** /{organization-id}/tokens/{token-id} | Delete a token of the organization
-*SigningTodayAPIClient::TokensApi* | [**get_token**](docs/TokensApi.md#get_token) | **GET** /{organization-id}/tokens/{token-id} | Get information about a token
-*SigningTodayAPIClient::TokensApi* | [**list_tokens**](docs/TokensApi.md#list_tokens) | **GET** /{organization-id}/tokens | Enumerate the tokens of an organization
-*SigningTodayAPIClient::TokensApi* | [**list_user_tokens**](docs/TokensApi.md#list_user_tokens) | **GET** /{organization-id}/users/{user-id}/tokens | Enumerate the tokens of an user
-*SigningTodayAPIClient::TokensApi* | [**update_token**](docs/TokensApi.md#update_token) | **PUT** /{organization-id}/tokens/{token-id} | Update the properties of a token
-*SigningTodayAPIClient::UsersApi* | [**create_user**](docs/UsersApi.md#create_user) | **POST** /{organization-id}/users | Create a user of the organization
-*SigningTodayAPIClient::UsersApi* | [**get_user**](docs/UsersApi.md#get_user) | **GET** /{organization-id}/users/{user-id} | Get information about an user
-*SigningTodayAPIClient::UsersApi* | [**list_users**](docs/UsersApi.md#list_users) | **GET** /{organization-id}/users | Enumerate the users of an organization
-*SigningTodayAPIClient::UsersApi* | [**update_user**](docs/UsersApi.md#update_user) | **PUT** /{organization-id}/users/{user-id} | Edit one or more user properties
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_alfresco_sync_get**](docs/BackofficeApi.md#organization_id_alfresco_sync_get) | **GET** /organization/{id}/alfrescoSync | Sync all completed DSTs on Alfresco
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_alfresco_sync_post**](docs/BackofficeApi.md#organization_id_alfresco_sync_post) | **POST** /organization/{id}/alfrescoSync | Sync all completed DSTs on Alfresco
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_delete**](docs/BackofficeApi.md#organization_id_delete) | **DELETE** /organization/{id} | Enable or disable an Organization account.
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_get**](docs/BackofficeApi.md#organization_id_get) | **GET** /organization/{id} | Retrieve info on one organization
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_public_get**](docs/BackofficeApi.md#organization_id_public_get) | **GET** /organization/public | Retrieve public resources
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_put**](docs/BackofficeApi.md#organization_id_put) | **PUT** /organization/{id} | Update info on one organization
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_resource_get**](docs/BackofficeApi.md#organization_id_resource_get) | **GET** /organization/{id}/resource | Get an organization resource
+*SigningTodayAPIClient::BackofficeApi* | [**organization_id_resource_put**](docs/BackofficeApi.md#organization_id_resource_put) | **PUT** /organization/{id}/resource | Create or overwrite an organization resource
+*SigningTodayAPIClient::BackofficeApi* | [**organization_resource_id_delete**](docs/BackofficeApi.md#organization_resource_id_delete) | **DELETE** /organization/{id}/resource | Delete an organization resource
+*SigningTodayAPIClient::BackofficeApi* | [**organization_resources_get**](docs/BackofficeApi.md#organization_resources_get) | **GET** /organization/{id}/resources | List all the organization resources
+*SigningTodayAPIClient::BackofficeApi* | [**organization_tags_get**](docs/BackofficeApi.md#organization_tags_get) | **GET** /organization/tags | Retrieve organization tags
+*SigningTodayAPIClient::BackofficeApi* | [**organizations_get**](docs/BackofficeApi.md#organizations_get) | **GET** /organizations | Get the list of organizations
+*SigningTodayAPIClient::BackofficeApi* | [**organizations_post**](docs/BackofficeApi.md#organizations_post) | **POST** /organizations | Create a new organization
+*SigningTodayAPIClient::Bit4idPathgroupDSTNoteApi* | [**d_st_id_note_get**](docs/Bit4idPathgroupDSTNoteApi.md#d_st_id_note_get) | **GET** /DST/{id}/note | Retrieve the DSTNotes associated to the DST
+*SigningTodayAPIClient::Bit4idPathgroupDSTNoteApi* | [**d_st_id_note_note_id_delete**](docs/Bit4idPathgroupDSTNoteApi.md#d_st_id_note_note_id_delete) | **DELETE** /DST/{id}/note/{noteId} | Delete a DSTNote
+*SigningTodayAPIClient::Bit4idPathgroupDSTNoteApi* | [**d_st_id_note_note_id_put**](docs/Bit4idPathgroupDSTNoteApi.md#d_st_id_note_note_id_put) | **PUT** /DST/{id}/note/{noteId} | Edit a DSTNote
+*SigningTodayAPIClient::Bit4idPathgroupDSTNoteApi* | [**d_st_id_note_post**](docs/Bit4idPathgroupDSTNoteApi.md#d_st_id_note_post) | **POST** /DST/{id}/note | Append a new DSTNote
+*SigningTodayAPIClient::Bit4idPathgroupDevicesApi* | [**device_authorization_delete**](docs/Bit4idPathgroupDevicesApi.md#device_authorization_delete) | **DELETE** /device/authorization | Clear a trusted device
+*SigningTodayAPIClient::Bit4idPathgroupDevicesApi* | [**device_authorization_get**](docs/Bit4idPathgroupDevicesApi.md#device_authorization_get) | **GET** /device/authorization | Retrieve a challenge for authorizing a new trusted device
+*SigningTodayAPIClient::Bit4idPathgroupDevicesApi* | [**device_authorization_post**](docs/Bit4idPathgroupDevicesApi.md#device_authorization_post) | **POST** /device/authorization | Register a new trusted device
+*SigningTodayAPIClient::Bit4idPathgroupDevicesApi* | [**devices_get**](docs/Bit4idPathgroupDevicesApi.md#devices_get) | **GET** /devices | Get the list of trusted devices
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_s_ts_get**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_s_ts_get) | **GET** /DSTs | Retrieve DSTs
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_s_ts_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_s_ts_post) | **POST** /DSTs | Create a new DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_audit_get**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_audit_get) | **GET** /DST/{id}/audit | Retrieve the audit records associated to the DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_delete**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_delete) | **DELETE** /DST/{id} | Delete a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_fill_patch**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_fill_patch) | **PATCH** /DST/{id}/fill | Fill a form of a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_get**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_get) | **GET** /DST/{id} | Retrieve a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_instantiate_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_instantiate_post) | **POST** /DST/{id}/instantiate | Instantiate a DST from a template
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_modify_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_modify_post) | **POST** /DST/{id}/modify | Modify a published DST template
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_notify_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_notify_post) | **POST** /DST/{id}/notify | Send notifications for a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_publish_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_publish_post) | **POST** /DST/{id}/publish | Publish a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_put**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_put) | **PUT** /DST/{id} | Update a DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_replace_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_replace_post) | **POST** /DST/{id}/replace | Replace a rejected DST
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_sign_doc_id_sign_id_get**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_sign_doc_id_sign_id_get) | **GET** /DST/{id}/sign/{docId}/{signId} | Return the address for signing
+*SigningTodayAPIClient::Bit4idPathgroupDigitalSignatureTransactionsApi* | [**d_st_id_templatize_post**](docs/Bit4idPathgroupDigitalSignatureTransactionsApi.md#d_st_id_templatize_post) | **POST** /DST/{id}/templatize | Create a template from a DST
+*SigningTodayAPIClient::Bit4idPathgroupNotificationsApi* | [**notifications_dst_id_delete**](docs/Bit4idPathgroupNotificationsApi.md#notifications_dst_id_delete) | **DELETE** /notifications/dst/{id} | Clear Notifications for a DST
+*SigningTodayAPIClient::Bit4idPathgroupNotificationsApi* | [**notifications_dsts_get**](docs/Bit4idPathgroupNotificationsApi.md#notifications_dsts_get) | **GET** /notifications/dsts | Get latest DST Notifications
+*SigningTodayAPIClient::Bit4idPathgroupNotificationsApi* | [**notifications_push_token_delete**](docs/Bit4idPathgroupNotificationsApi.md#notifications_push_token_delete) | **DELETE** /notifications/push-token | Clear a registered push notification token
+*SigningTodayAPIClient::Bit4idPathgroupNotificationsApi* | [**notifications_push_token_post**](docs/Bit4idPathgroupNotificationsApi.md#notifications_push_token_post) | **POST** /notifications/push-token | Register a token for push notifications
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**d_st_id_resources_get**](docs/Bit4idPathgroupResourcesApi.md#d_st_id_resources_get) | **GET** /DST/{id}/resources | Retrieve all resources associated to a DST
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**d_st_id_resources_patch**](docs/Bit4idPathgroupResourcesApi.md#d_st_id_resources_patch) | **PATCH** /DST/{id}/resources | Append a new resource to a DST
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**d_st_resource_id_delete**](docs/Bit4idPathgroupResourcesApi.md#d_st_resource_id_delete) | **DELETE** /DST/resource/{id} | Delete a Resource
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**resource_id_get**](docs/Bit4idPathgroupResourcesApi.md#resource_id_get) | **GET** /resource/{id} | Retrieve a Resource
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**resource_id_put**](docs/Bit4idPathgroupResourcesApi.md#resource_id_put) | **PUT** /resource/{id} | Update a Resource
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**user_id_identity_identity_id_appearance_delete**](docs/Bit4idPathgroupResourcesApi.md#user_id_identity_identity_id_appearance_delete) | **DELETE** /user/{id}/identity/{identity-id}/appearance | Delete a user appearance resource.
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**user_id_identity_identity_id_appearance_get**](docs/Bit4idPathgroupResourcesApi.md#user_id_identity_identity_id_appearance_get) | **GET** /user/{id}/identity/{identity-id}/appearance | Download an identity appearance resource
+*SigningTodayAPIClient::Bit4idPathgroupResourcesApi* | [**user_id_identity_identity_id_appearance_post**](docs/Bit4idPathgroupResourcesApi.md#user_id_identity_identity_id_appearance_post) | **POST** /user/{id}/identity/{identity-id}/appearance | Add a graphical appearance to a user's identity
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_authentication_delete**](docs/Bit4idPathgroupRobotsApi.md#robot_authentication_delete) | **DELETE** /robot/authentication | Clear a Robot authentication lifetime token
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_authentication_get**](docs/Bit4idPathgroupRobotsApi.md#robot_authentication_get) | **GET** /robot/authentication | Retrieve the Robot authentication lifetime token
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_configuration_get**](docs/Bit4idPathgroupRobotsApi.md#robot_configuration_get) | **GET** /robot/configuration | Retrieve the Robot configuration
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_configuration_put**](docs/Bit4idPathgroupRobotsApi.md#robot_configuration_put) | **PUT** /robot/configuration | Edit the Robot configuration
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_ds_ts_post**](docs/Bit4idPathgroupRobotsApi.md#robot_ds_ts_post) | **POST** /robot/DSTs | Create a new DST in one call
+*SigningTodayAPIClient::Bit4idPathgroupRobotsApi* | [**robot_id_instantiate_post**](docs/Bit4idPathgroupRobotsApi.md#robot_id_instantiate_post) | **POST** /robot/{id}/instantiate | Instantiate a DST from a template by robot
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_change_password_post**](docs/Bit4idPathgroupServicesApi.md#auth_change_password_post) | **POST** /auth/changePassword | Consume a token to change the password
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_password_lost_get**](docs/Bit4idPathgroupServicesApi.md#auth_password_lost_get) | **GET** /auth/passwordLost | Request to recover own password
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_password_reset_get**](docs/Bit4idPathgroupServicesApi.md#auth_password_reset_get) | **GET** /auth/passwordReset | Reset a user password with superuser
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_password_reset_post**](docs/Bit4idPathgroupServicesApi.md#auth_password_reset_post) | **POST** /auth/passwordReset | Reset your own password
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_password_token_get**](docs/Bit4idPathgroupServicesApi.md#auth_password_token_get) | **GET** /auth/passwordToken | Get token to change password
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_saml_post**](docs/Bit4idPathgroupServicesApi.md#auth_saml_post) | **POST** /auth/saml | Register or Update a SAML user
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**auth_user**](docs/Bit4idPathgroupServicesApi.md#auth_user) | **GET** /auth/user | Return the current logged in user
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**configuration_get**](docs/Bit4idPathgroupServicesApi.md#configuration_get) | **GET** /service/configuration | Retrieve the App configuration
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**logout_user**](docs/Bit4idPathgroupServicesApi.md#logout_user) | **GET** /auth/logout | Log out current user terminating the session
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**oauth_token_post**](docs/Bit4idPathgroupServicesApi.md#oauth_token_post) | **POST** /oauth/token | Get the bearer token
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**pdf_resource_id_thumbs_get**](docs/Bit4idPathgroupServicesApi.md#pdf_resource_id_thumbs_get) | **GET** /pdfResource/{id}/thumbs | Retrieve a Resource (of service)
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**service_change_password_post**](docs/Bit4idPathgroupServicesApi.md#service_change_password_post) | **POST** /service/changePassword | Change the password of a service user
+*SigningTodayAPIClient::Bit4idPathgroupServicesApi* | [**service_users_sync_post**](docs/Bit4idPathgroupServicesApi.md#service_users_sync_post) | **POST** /service/users/sync | Sync user accounts
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**user_id_delete**](docs/Bit4idPathgroupUsersApi.md#user_id_delete) | **DELETE** /user/{id} | Enable or disable a User
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**user_id_get**](docs/Bit4idPathgroupUsersApi.md#user_id_get) | **GET** /user/{id} | Retrieve a User
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**user_id_identities_get**](docs/Bit4idPathgroupUsersApi.md#user_id_identities_get) | **GET** /user/{id}/identities | Retrieve User identities
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**user_id_put**](docs/Bit4idPathgroupUsersApi.md#user_id_put) | **PUT** /user/{id} | Update a User
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**user_id_role_put**](docs/Bit4idPathgroupUsersApi.md#user_id_role_put) | **PUT** /user/{id}/role | Change the User role
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**users_get**](docs/Bit4idPathgroupUsersApi.md#users_get) | **GET** /users | Retrieve Users
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**users_groups_get**](docs/Bit4idPathgroupUsersApi.md#users_groups_get) | **GET** /users/groups | Retrieve UserGroups
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**users_groups_post**](docs/Bit4idPathgroupUsersApi.md#users_groups_post) | **POST** /users/groups | Create a new UserGroups
+*SigningTodayAPIClient::Bit4idPathgroupUsersApi* | [**users_post**](docs/Bit4idPathgroupUsersApi.md#users_post) | **POST** /users | Create a new User
+*SigningTodayAPIClient::DSTNoteApi* | [**d_st_id_note_get**](docs/DSTNoteApi.md#d_st_id_note_get) | **GET** /DST/{id}/note | Retrieve the DSTNotes associated to the DST
+*SigningTodayAPIClient::DSTNoteApi* | [**d_st_id_note_note_id_delete**](docs/DSTNoteApi.md#d_st_id_note_note_id_delete) | **DELETE** /DST/{id}/note/{noteId} | Delete a DSTNote
+*SigningTodayAPIClient::DSTNoteApi* | [**d_st_id_note_note_id_put**](docs/DSTNoteApi.md#d_st_id_note_note_id_put) | **PUT** /DST/{id}/note/{noteId} | Edit a DSTNote
+*SigningTodayAPIClient::DSTNoteApi* | [**d_st_id_note_post**](docs/DSTNoteApi.md#d_st_id_note_post) | **POST** /DST/{id}/note | Append a new DSTNote
+*SigningTodayAPIClient::DevicesApi* | [**device_authorization_delete**](docs/DevicesApi.md#device_authorization_delete) | **DELETE** /device/authorization | Clear a trusted device
+*SigningTodayAPIClient::DevicesApi* | [**device_authorization_get**](docs/DevicesApi.md#device_authorization_get) | **GET** /device/authorization | Retrieve a challenge for authorizing a new trusted device
+*SigningTodayAPIClient::DevicesApi* | [**device_authorization_post**](docs/DevicesApi.md#device_authorization_post) | **POST** /device/authorization | Register a new trusted device
+*SigningTodayAPIClient::DevicesApi* | [**devices_get**](docs/DevicesApi.md#devices_get) | **GET** /devices | Get the list of trusted devices
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_s_ts_get**](docs/DigitalSignatureTransactionsApi.md#d_s_ts_get) | **GET** /DSTs | Retrieve DSTs
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_s_ts_post**](docs/DigitalSignatureTransactionsApi.md#d_s_ts_post) | **POST** /DSTs | Create a new DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_audit_get**](docs/DigitalSignatureTransactionsApi.md#d_st_id_audit_get) | **GET** /DST/{id}/audit | Retrieve the audit records associated to the DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_delete**](docs/DigitalSignatureTransactionsApi.md#d_st_id_delete) | **DELETE** /DST/{id} | Delete a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_fill_patch**](docs/DigitalSignatureTransactionsApi.md#d_st_id_fill_patch) | **PATCH** /DST/{id}/fill | Fill a form of a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_get**](docs/DigitalSignatureTransactionsApi.md#d_st_id_get) | **GET** /DST/{id} | Retrieve a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_instantiate_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_instantiate_post) | **POST** /DST/{id}/instantiate | Instantiate a DST from a template
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_modify_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_modify_post) | **POST** /DST/{id}/modify | Modify a published DST template
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_notify_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_notify_post) | **POST** /DST/{id}/notify | Send notifications for a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_publish_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_publish_post) | **POST** /DST/{id}/publish | Publish a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_put**](docs/DigitalSignatureTransactionsApi.md#d_st_id_put) | **PUT** /DST/{id} | Update a DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_replace_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_replace_post) | **POST** /DST/{id}/replace | Replace a rejected DST
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_sign_doc_id_sign_id_get**](docs/DigitalSignatureTransactionsApi.md#d_st_id_sign_doc_id_sign_id_get) | **GET** /DST/{id}/sign/{docId}/{signId} | Return the address for signing
+*SigningTodayAPIClient::DigitalSignatureTransactionsApi* | [**d_st_id_templatize_post**](docs/DigitalSignatureTransactionsApi.md#d_st_id_templatize_post) | **POST** /DST/{id}/templatize | Create a template from a DST
+*SigningTodayAPIClient::NotificationsApi* | [**notifications_dst_id_delete**](docs/NotificationsApi.md#notifications_dst_id_delete) | **DELETE** /notifications/dst/{id} | Clear Notifications for a DST
+*SigningTodayAPIClient::NotificationsApi* | [**notifications_dsts_get**](docs/NotificationsApi.md#notifications_dsts_get) | **GET** /notifications/dsts | Get latest DST Notifications
+*SigningTodayAPIClient::NotificationsApi* | [**notifications_push_token_delete**](docs/NotificationsApi.md#notifications_push_token_delete) | **DELETE** /notifications/push-token | Clear a registered push notification token
+*SigningTodayAPIClient::NotificationsApi* | [**notifications_push_token_post**](docs/NotificationsApi.md#notifications_push_token_post) | **POST** /notifications/push-token | Register a token for push notifications
+*SigningTodayAPIClient::ResourcesApi* | [**d_st_id_resources_get**](docs/ResourcesApi.md#d_st_id_resources_get) | **GET** /DST/{id}/resources | Retrieve all resources associated to a DST
+*SigningTodayAPIClient::ResourcesApi* | [**d_st_id_resources_patch**](docs/ResourcesApi.md#d_st_id_resources_patch) | **PATCH** /DST/{id}/resources | Append a new resource to a DST
+*SigningTodayAPIClient::ResourcesApi* | [**d_st_resource_id_delete**](docs/ResourcesApi.md#d_st_resource_id_delete) | **DELETE** /DST/resource/{id} | Delete a Resource
+*SigningTodayAPIClient::ResourcesApi* | [**resource_id_get**](docs/ResourcesApi.md#resource_id_get) | **GET** /resource/{id} | Retrieve a Resource
+*SigningTodayAPIClient::ResourcesApi* | [**resource_id_put**](docs/ResourcesApi.md#resource_id_put) | **PUT** /resource/{id} | Update a Resource
+*SigningTodayAPIClient::ResourcesApi* | [**user_id_identity_identity_id_appearance_delete**](docs/ResourcesApi.md#user_id_identity_identity_id_appearance_delete) | **DELETE** /user/{id}/identity/{identity-id}/appearance | Delete a user appearance resource.
+*SigningTodayAPIClient::ResourcesApi* | [**user_id_identity_identity_id_appearance_get**](docs/ResourcesApi.md#user_id_identity_identity_id_appearance_get) | **GET** /user/{id}/identity/{identity-id}/appearance | Download an identity appearance resource
+*SigningTodayAPIClient::ResourcesApi* | [**user_id_identity_identity_id_appearance_post**](docs/ResourcesApi.md#user_id_identity_identity_id_appearance_post) | **POST** /user/{id}/identity/{identity-id}/appearance | Add a graphical appearance to a user's identity
+*SigningTodayAPIClient::RobotApi* | [**robot_configuration_put**](docs/RobotApi.md#robot_configuration_put) | **PUT** /robot/configuration | Edit the Robot configuration
+*SigningTodayAPIClient::RobotsApi* | [**robot_authentication_delete**](docs/RobotsApi.md#robot_authentication_delete) | **DELETE** /robot/authentication | Clear a Robot authentication lifetime token
+*SigningTodayAPIClient::RobotsApi* | [**robot_authentication_get**](docs/RobotsApi.md#robot_authentication_get) | **GET** /robot/authentication | Retrieve the Robot authentication lifetime token
+*SigningTodayAPIClient::RobotsApi* | [**robot_configuration_get**](docs/RobotsApi.md#robot_configuration_get) | **GET** /robot/configuration | Retrieve the Robot configuration
+*SigningTodayAPIClient::RobotsApi* | [**robot_ds_ts_post**](docs/RobotsApi.md#robot_ds_ts_post) | **POST** /robot/DSTs | Create a new DST in one call
+*SigningTodayAPIClient::RobotsApi* | [**robot_id_instantiate_post**](docs/RobotsApi.md#robot_id_instantiate_post) | **POST** /robot/{id}/instantiate | Instantiate a DST from a template by robot
+*SigningTodayAPIClient::ServicesApi* | [**auth_change_password_post**](docs/ServicesApi.md#auth_change_password_post) | **POST** /auth/changePassword | Consume a token to change the password
+*SigningTodayAPIClient::ServicesApi* | [**auth_password_lost_get**](docs/ServicesApi.md#auth_password_lost_get) | **GET** /auth/passwordLost | Request to recover own password
+*SigningTodayAPIClient::ServicesApi* | [**auth_password_reset_get**](docs/ServicesApi.md#auth_password_reset_get) | **GET** /auth/passwordReset | Reset a user password with superuser
+*SigningTodayAPIClient::ServicesApi* | [**auth_password_reset_post**](docs/ServicesApi.md#auth_password_reset_post) | **POST** /auth/passwordReset | Reset your own password
+*SigningTodayAPIClient::ServicesApi* | [**auth_password_token_get**](docs/ServicesApi.md#auth_password_token_get) | **GET** /auth/passwordToken | Get token to change password
+*SigningTodayAPIClient::ServicesApi* | [**auth_saml_post**](docs/ServicesApi.md#auth_saml_post) | **POST** /auth/saml | Register or Update a SAML user
+*SigningTodayAPIClient::ServicesApi* | [**auth_user**](docs/ServicesApi.md#auth_user) | **GET** /auth/user | Return the current logged in user
+*SigningTodayAPIClient::ServicesApi* | [**configuration_get**](docs/ServicesApi.md#configuration_get) | **GET** /service/configuration | Retrieve the App configuration
+*SigningTodayAPIClient::ServicesApi* | [**logout_user**](docs/ServicesApi.md#logout_user) | **GET** /auth/logout | Log out current user terminating the session
+*SigningTodayAPIClient::ServicesApi* | [**oauth_token_post**](docs/ServicesApi.md#oauth_token_post) | **POST** /oauth/token | Get the bearer token
+*SigningTodayAPIClient::ServicesApi* | [**pdf_resource_id_thumbs_get**](docs/ServicesApi.md#pdf_resource_id_thumbs_get) | **GET** /pdfResource/{id}/thumbs | Retrieve a Resource (of service)
+*SigningTodayAPIClient::ServicesApi* | [**service_change_password_post**](docs/ServicesApi.md#service_change_password_post) | **POST** /service/changePassword | Change the password of a service user
+*SigningTodayAPIClient::ServicesApi* | [**service_users_sync_post**](docs/ServicesApi.md#service_users_sync_post) | **POST** /service/users/sync | Sync user accounts
+*SigningTodayAPIClient::SigningServicesApi* | [**sign_service_open**](docs/SigningServicesApi.md#sign_service_open) | **POST** /sign-service/open | sign-service open post
+*SigningTodayAPIClient::SigningServicesApi* | [**sign_service_open_id**](docs/SigningServicesApi.md#sign_service_open_id) | **POST** /sign-service/open/{transaction-id} | sign-service-open-transaction-id post
+*SigningTodayAPIClient::SigningServicesApi* | [**signature_id_perform_id_post**](docs/SigningServicesApi.md#signature_id_perform_id_post) | **POST** /sign-service/{signature-id}/perform/{identity-id} | sign-service-signature-id-perform-identity-id post
+*SigningTodayAPIClient::UsersApi* | [**user_id_delete**](docs/UsersApi.md#user_id_delete) | **DELETE** /user/{id} | Enable or disable a User
+*SigningTodayAPIClient::UsersApi* | [**user_id_get**](docs/UsersApi.md#user_id_get) | **GET** /user/{id} | Retrieve a User
+*SigningTodayAPIClient::UsersApi* | [**user_id_identities_get**](docs/UsersApi.md#user_id_identities_get) | **GET** /user/{id}/identities | Retrieve User identities
+*SigningTodayAPIClient::UsersApi* | [**user_id_put**](docs/UsersApi.md#user_id_put) | **PUT** /user/{id} | Update a User
+*SigningTodayAPIClient::UsersApi* | [**user_id_role_put**](docs/UsersApi.md#user_id_role_put) | **PUT** /user/{id}/role | Change the User role
+*SigningTodayAPIClient::UsersApi* | [**users_get**](docs/UsersApi.md#users_get) | **GET** /users | Retrieve Users
+*SigningTodayAPIClient::UsersApi* | [**users_groups_get**](docs/UsersApi.md#users_groups_get) | **GET** /users/groups | Retrieve UserGroups
+*SigningTodayAPIClient::UsersApi* | [**users_groups_post**](docs/UsersApi.md#users_groups_post) | **POST** /users/groups | Create a new UserGroups
+*SigningTodayAPIClient::UsersApi* | [**users_post**](docs/UsersApi.md#users_post) | **POST** /users | Create a new User
+
+
 ## Documentation for Models
- - [SigningTodayAPIClient::AutomaticSignature](docs/AutomaticSignature.md)
- - [SigningTodayAPIClient::CreateIdentitybyToken](docs/CreateIdentitybyToken.md)
- - [SigningTodayAPIClient::CreateSignatureTransaction](docs/CreateSignatureTransaction.md)
- - [SigningTodayAPIClient::CreateToken](docs/CreateToken.md)
- - [SigningTodayAPIClient::CreateTokenHttpOptions](docs/CreateTokenHttpOptions.md)
- - [SigningTodayAPIClient::CreateTokenWebhooks](docs/CreateTokenWebhooks.md)
- - [SigningTodayAPIClient::CreateUser](docs/CreateUser.md)
+
+ - [SigningTodayAPIClient::AlfrescoSync](docs/AlfrescoSync.md)
+ - [SigningTodayAPIClient::AuditRecord](docs/AuditRecord.md)
+ - [SigningTodayAPIClient::AuthCredential](docs/AuthCredential.md)
+ - [SigningTodayAPIClient::CreateDigitalSignatureTransaction](docs/CreateDigitalSignatureTransaction.md)
+ - [SigningTodayAPIClient::CreateDocument](docs/CreateDocument.md)
+ - [SigningTodayAPIClient::CreateDocumentResource](docs/CreateDocumentResource.md)
+ - [SigningTodayAPIClient::CreateDocumentSource](docs/CreateDocumentSource.md)
+ - [SigningTodayAPIClient::CreateUserRequest](docs/CreateUserRequest.md)
+ - [SigningTodayAPIClient::DSTNote](docs/DSTNote.md)
+ - [SigningTodayAPIClient::DSTSigningAddressResponse](docs/DSTSigningAddressResponse.md)
+ - [SigningTodayAPIClient::DSTStatusChangedNotification](docs/DSTStatusChangedNotification.md)
+ - [SigningTodayAPIClient::DSTsGetResponse](docs/DSTsGetResponse.md)
+ - [SigningTodayAPIClient::DeviceAuthorizationResponse](docs/DeviceAuthorizationResponse.md)
+ - [SigningTodayAPIClient::DigitalSignatureTransaction](docs/DigitalSignatureTransaction.md)
  - [SigningTodayAPIClient::Document](docs/Document.md)
- - [SigningTodayAPIClient::Document1](docs/Document1.md)
+ - [SigningTodayAPIClient::ErrorResponse](docs/ErrorResponse.md)
+ - [SigningTodayAPIClient::FillableForm](docs/FillableForm.md)
  - [SigningTodayAPIClient::Identity](docs/Identity.md)
- - [SigningTodayAPIClient::IdentityActions](docs/IdentityActions.md)
- - [SigningTodayAPIClient::IdentityAssociation](docs/IdentityAssociation.md)
- - [SigningTodayAPIClient::IdentityEnroll](docs/IdentityEnroll.md)
- - [SigningTodayAPIClient::IdentityEnrollActions](docs/IdentityEnrollActions.md)
- - [SigningTodayAPIClient::IdentityRequest](docs/IdentityRequest.md)
+ - [SigningTodayAPIClient::IdentityProviderData](docs/IdentityProviderData.md)
+ - [SigningTodayAPIClient::IdentityProviderDataTokenInfo](docs/IdentityProviderDataTokenInfo.md)
  - [SigningTodayAPIClient::InlineObject](docs/InlineObject.md)
  - [SigningTodayAPIClient::InlineObject1](docs/InlineObject1.md)
  - [SigningTodayAPIClient::InlineObject2](docs/InlineObject2.md)
  - [SigningTodayAPIClient::InlineObject3](docs/InlineObject3.md)
  - [SigningTodayAPIClient::InlineObject4](docs/InlineObject4.md)
+ - [SigningTodayAPIClient::InlineObject5](docs/InlineObject5.md)
+ - [SigningTodayAPIClient::InlineObject6](docs/InlineObject6.md)
+ - [SigningTodayAPIClient::InlineObject7](docs/InlineObject7.md)
+ - [SigningTodayAPIClient::InlineObject8](docs/InlineObject8.md)
+ - [SigningTodayAPIClient::InlineObject9](docs/InlineObject9.md)
  - [SigningTodayAPIClient::InlineResponse200](docs/InlineResponse200.md)
- - [SigningTodayAPIClient::InlineResponse2001](docs/InlineResponse2001.md)
- - [SigningTodayAPIClient::InlineResponse20010](docs/InlineResponse20010.md)
- - [SigningTodayAPIClient::InlineResponse20010Data](docs/InlineResponse20010Data.md)
- - [SigningTodayAPIClient::InlineResponse20011](docs/InlineResponse20011.md)
- - [SigningTodayAPIClient::InlineResponse20012](docs/InlineResponse20012.md)
- - [SigningTodayAPIClient::InlineResponse2002](docs/InlineResponse2002.md)
- - [SigningTodayAPIClient::InlineResponse2003](docs/InlineResponse2003.md)
- - [SigningTodayAPIClient::InlineResponse2004](docs/InlineResponse2004.md)
- - [SigningTodayAPIClient::InlineResponse2005](docs/InlineResponse2005.md)
- - [SigningTodayAPIClient::InlineResponse2006](docs/InlineResponse2006.md)
- - [SigningTodayAPIClient::InlineResponse2007](docs/InlineResponse2007.md)
- - [SigningTodayAPIClient::InlineResponse2007Meta](docs/InlineResponse2007Meta.md)
- - [SigningTodayAPIClient::InlineResponse2008](docs/InlineResponse2008.md)
- - [SigningTodayAPIClient::InlineResponse2009](docs/InlineResponse2009.md)
- - [SigningTodayAPIClient::InlineResponse201](docs/InlineResponse201.md)
- - [SigningTodayAPIClient::InlineResponse2011](docs/InlineResponse2011.md)
- - [SigningTodayAPIClient::InlineResponse2012](docs/InlineResponse2012.md)
- - [SigningTodayAPIClient::InlineResponse2013](docs/InlineResponse2013.md)
- - [SigningTodayAPIClient::InlineResponse2014](docs/InlineResponse2014.md)
- - [SigningTodayAPIClient::InlineResponse2015](docs/InlineResponse2015.md)
- - [SigningTodayAPIClient::InlineResponse201Data](docs/InlineResponse201Data.md)
- - [SigningTodayAPIClient::InlineResponse401](docs/InlineResponse401.md)
- - [SigningTodayAPIClient::InlineResponse403](docs/InlineResponse403.md)
- - [SigningTodayAPIClient::InlineResponse404](docs/InlineResponse404.md)
- - [SigningTodayAPIClient::MetaDataError](docs/MetaDataError.md)
- - [SigningTodayAPIClient::MetaDataSuccess](docs/MetaDataSuccess.md)
+ - [SigningTodayAPIClient::InstantiateDSTTemplate](docs/InstantiateDSTTemplate.md)
+ - [SigningTodayAPIClient::LFResource](docs/LFResource.md)
+ - [SigningTodayAPIClient::NotificationEvent](docs/NotificationEvent.md)
+ - [SigningTodayAPIClient::NotificationsResponse](docs/NotificationsResponse.md)
  - [SigningTodayAPIClient::Organization](docs/Organization.md)
+ - [SigningTodayAPIClient::OrganizationPrivateSettings](docs/OrganizationPrivateSettings.md)
+ - [SigningTodayAPIClient::OrganizationPublicSettings](docs/OrganizationPublicSettings.md)
  - [SigningTodayAPIClient::OrganizationSettings](docs/OrganizationSettings.md)
- - [SigningTodayAPIClient::PaginationData](docs/PaginationData.md)
- - [SigningTodayAPIClient::SMS](docs/SMS.md)
+ - [SigningTodayAPIClient::OrganizationSettingsAlfrescoProperties](docs/OrganizationSettingsAlfrescoProperties.md)
+ - [SigningTodayAPIClient::OrganizationsGetResponse](docs/OrganizationsGetResponse.md)
+ - [SigningTodayAPIClient::RobotAuthenticationToken](docs/RobotAuthenticationToken.md)
+ - [SigningTodayAPIClient::RobotConfiguration](docs/RobotConfiguration.md)
+ - [SigningTodayAPIClient::RobotConfigurationAuthentication](docs/RobotConfigurationAuthentication.md)
+ - [SigningTodayAPIClient::RobotConfigurationWebhooks](docs/RobotConfigurationWebhooks.md)
+ - [SigningTodayAPIClient::RobotIdInstantiateRolesMapping](docs/RobotIdInstantiateRolesMapping.md)
+ - [SigningTodayAPIClient::SAMLToken](docs/SAMLToken.md)
+ - [SigningTodayAPIClient::SAMLTokenEduPersonTargetedID](docs/SAMLTokenEduPersonTargetedID.md)
+ - [SigningTodayAPIClient::ServiceFailureResponse](docs/ServiceFailureResponse.md)
  - [SigningTodayAPIClient::Signature](docs/Signature.md)
- - [SigningTodayAPIClient::SignatureDST](docs/SignatureDST.md)
- - [SigningTodayAPIClient::SignatureDSTWhere](docs/SignatureDSTWhere.md)
- - [SigningTodayAPIClient::SignatureImplementationResponse](docs/SignatureImplementationResponse.md)
- - [SigningTodayAPIClient::SignatureImplementationResponseChannel](docs/SignatureImplementationResponseChannel.md)
- - [SigningTodayAPIClient::SignatureTransaction](docs/SignatureTransaction.md)
- - [SigningTodayAPIClient::SignatureWhere](docs/SignatureWhere.md)
- - [SigningTodayAPIClient::Token](docs/Token.md)
- - [SigningTodayAPIClient::UpdateOrganization](docs/UpdateOrganization.md)
- - [SigningTodayAPIClient::UpdateToken](docs/UpdateToken.md)
- - [SigningTodayAPIClient::UpdateUser](docs/UpdateUser.md)
+ - [SigningTodayAPIClient::SignatureRequest](docs/SignatureRequest.md)
+ - [SigningTodayAPIClient::SignatureRestriction](docs/SignatureRestriction.md)
+ - [SigningTodayAPIClient::SignatureStatusChangedNotification](docs/SignatureStatusChangedNotification.md)
+ - [SigningTodayAPIClient::SignatureStatusChangedNotificationDocument](docs/SignatureStatusChangedNotificationDocument.md)
+ - [SigningTodayAPIClient::SignatureStatusChangedNotificationDst](docs/SignatureStatusChangedNotificationDst.md)
+ - [SigningTodayAPIClient::Signer](docs/Signer.md)
+ - [SigningTodayAPIClient::SignerInstance](docs/SignerInstance.md)
+ - [SigningTodayAPIClient::SignerRecord](docs/SignerRecord.md)
+ - [SigningTodayAPIClient::SignersGroup](docs/SignersGroup.md)
+ - [SigningTodayAPIClient::TrustedDevice](docs/TrustedDevice.md)
+ - [SigningTodayAPIClient::TrustedDevicesGetResponse](docs/TrustedDevicesGetResponse.md)
  - [SigningTodayAPIClient::User](docs/User.md)
+ - [SigningTodayAPIClient::UserGroup](docs/UserGroup.md)
+ - [SigningTodayAPIClient::UserGroupGetResponse](docs/UserGroupGetResponse.md)
+ - [SigningTodayAPIClient::UserSyncReport](docs/UserSyncReport.md)
+ - [SigningTodayAPIClient::UserSyncReportUsers](docs/UserSyncReportUsers.md)
+ - [SigningTodayAPIClient::UsersGetResponse](docs/UsersGetResponse.md)
+
+
 ## Documentation for Authorization
-### ApiKeyAuth
-- **Type**: API key
-- **API key parameter name**: Authorization
-- **Location**: HTTP header
+
+
+### Basic
+
+- **Type**: HTTP basic authentication
+
+### OAuth2
+
+
+- **Type**: OAuth
+- **Flow**: password
+- **Authorization URL**: 
+- **Scopes**: 
+  - all: All Scopes
+  - signer: Grants read access
+  - admin: Grants read to an admin
+

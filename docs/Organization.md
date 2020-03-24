@@ -4,22 +4,34 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **String** | The uuid code that identifies the Organization | [optional] 
-**logo** | **String** | This is the url to the image is supposed to be used as logo of the Organization, for example the logo or the motto of the company is integrating SigningToday  | [optional] 
-**name** | **String** | This is an arbitrary name is possible to associate to the Organization  | [optional] 
+**id** | **String** |  | [optional] 
+**email_override_folder_path** | **String** |  | [optional] 
+**name** | **String** |  | [optional] 
+**contact_email** | **String** |  | [optional] 
+**contact_phone** | **String** |  | [optional] 
+**nation** | **String** |  | [optional] 
+**city** | **String** |  | [optional] 
+**deleted_at** | **DateTime** |  | [optional] [readonly] 
+**private_settings** | [**OrganizationPrivateSettings**](OrganizationPrivateSettings.md) |  | [optional] 
+**public_settings** | [**OrganizationPublicSettings**](OrganizationPublicSettings.md) |  | [optional] 
 **settings** | [**OrganizationSettings**](OrganizationSettings.md) |  | [optional] 
-**slug** | **String** | This is the _organization-slug_ that is used as parameter in the endpoints or in the body of the requests  | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::Organization.new(id: 737dc132-a3f0-11e9-a2a3-2a2ae2dbcce4,
-                                 logo: https://www.my-organization.com/logo.png,
-                                 name: Bit4id,
-                                 settings: null,
-                                 slug: bit4id)
+instance = SigningTodayAPIClient::Organization.new(id: null,
+                                 email_override_folder_path: null,
+                                 name: null,
+                                 contact_email: null,
+                                 contact_phone: null,
+                                 nation: null,
+                                 city: null,
+                                 deleted_at: 2007-04-02T19:30:10Z,
+                                 private_settings: null,
+                                 public_settings: null,
+                                 settings: null)
 ```
 
 

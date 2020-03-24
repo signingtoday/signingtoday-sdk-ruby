@@ -4,16 +4,20 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**channel_pub** | **String** | The channel pub | [optional] 
-**channel_sub** | **String** | The channel sub | [optional] 
+**file** | **File** | The file to upload | 
+**filename** | **String** | The name of the file | 
+**resource_type** | **String** |  | 
+**title** | **String** | User-defined title of the resource. | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineObject3.new(channel_pub: /channels/54747aa4-39c4-4ae4-8f0a-b0f41eb0d7d4,
-                                 channel_sub: /channels/91099073-905b-437e-b48f-f21c0e7f4723)
+instance = SigningTodayAPIClient::InlineObject3.new(file: null,
+                                 filename: contract.pdf,
+                                 resource_type: PDF_Document,
+                                 title: Sales Contract)
 ```
 
 

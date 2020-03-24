@@ -4,14 +4,20 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**reason** | **String** | This is the actual reason for the annulment of the Signature, to be provided in the body of the request  | [optional] 
+**file** | **File** | The path of the file to upload | 
+**filename** | **String** | The name of the file | 
+**resource_type** | **String** | The type of the resource | 
+**title** | **String** | User-defined title of the resource | [optional] 
 
 ## Code Sample
 
 ```ruby
 require 'SigningTodayAPIClient'
 
-instance = SigningTodayAPIClient::InlineObject2.new(reason: Reason for the annulment)
+instance = SigningTodayAPIClient::InlineObject2.new(file: null,
+                                 filename: contract.pdf,
+                                 resource_type: PDF_Document,
+                                 title: Sales Contract)
 ```
 
 
