@@ -13,47 +13,50 @@ OpenAPI Generator version: 4.2.3
 require 'date'
 
 module SigningTodayAPIClient
-  # Through this field it is possible to add some custom options to the HTTP request
-  class TokenHttpOptions
-    # Key-Value pairs that identifies headers to add to the HTTP request
-    attr_accessor :headers
+  class SignatureWhereText
+    attr_accessor :font
 
-    # The username for the HTTP basic authentication
-    attr_accessor :auth_username
+    attr_accessor :align
 
-    # The password for the HTTP basic authentication
-    attr_accessor :auth_password
+    attr_accessor :format
 
-    # The mode of the authentication
-    attr_accessor :auth_mode
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
 
-    # The SSL client key
-    attr_accessor :client_key
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
 
-    # the SSL client certificate
-    attr_accessor :client_cert
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'headers' => :'headers',
-        :'auth_username' => :'auth_username',
-        :'auth_password' => :'auth_password',
-        :'auth_mode' => :'auth_mode',
-        :'client_key' => :'client_key',
-        :'client_cert' => :'client_cert'
+        :'font' => :'font',
+        :'align' => :'align',
+        :'format' => :'format'
       }
     end
 
     # Attribute type mapping.
     def self.openapi_types
       {
-        :'headers' => :'Object',
-        :'auth_username' => :'String',
-        :'auth_password' => :'String',
-        :'auth_mode' => :'String',
-        :'client_key' => :'String',
-        :'client_cert' => :'String'
+        :'font' => :'SignatureWhereFont',
+        :'align' => :'String',
+        :'format' => :'Array<String>'
       }
     end
 
@@ -67,39 +70,29 @@ module SigningTodayAPIClient
     # @param [Hash] attributes Model attributes in the form of hash
     def initialize(attributes = {})
       if (!attributes.is_a?(Hash))
-        fail ArgumentError, "The input argument (attributes) must be a hash in `SigningTodayAPIClient::TokenHttpOptions` initialize method"
+        fail ArgumentError, "The input argument (attributes) must be a hash in `SigningTodayAPIClient::SignatureWhereText` initialize method"
       end
 
       # check to see if the attribute exists and convert string to symbol for hash key
       attributes = attributes.each_with_object({}) { |(k, v), h|
         if (!self.class.attribute_map.key?(k.to_sym))
-          fail ArgumentError, "`#{k}` is not a valid attribute in `SigningTodayAPIClient::TokenHttpOptions`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
+          fail ArgumentError, "`#{k}` is not a valid attribute in `SigningTodayAPIClient::SignatureWhereText`. Please check the name to make sure it's valid. List of attributes: " + self.class.attribute_map.keys.inspect
         end
         h[k.to_sym] = v
       }
 
-      if attributes.key?(:'headers')
-        self.headers = attributes[:'headers']
+      if attributes.key?(:'font')
+        self.font = attributes[:'font']
       end
 
-      if attributes.key?(:'auth_username')
-        self.auth_username = attributes[:'auth_username']
+      if attributes.key?(:'align')
+        self.align = attributes[:'align']
       end
 
-      if attributes.key?(:'auth_password')
-        self.auth_password = attributes[:'auth_password']
-      end
-
-      if attributes.key?(:'auth_mode')
-        self.auth_mode = attributes[:'auth_mode']
-      end
-
-      if attributes.key?(:'client_key')
-        self.client_key = attributes[:'client_key']
-      end
-
-      if attributes.key?(:'client_cert')
-        self.client_cert = attributes[:'client_cert']
+      if attributes.key?(:'format')
+        if (value = attributes[:'format']).is_a?(Array)
+          self.format = value
+        end
       end
     end
 
@@ -113,7 +106,19 @@ module SigningTodayAPIClient
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
+      align_validator = EnumAttributeValidator.new('String', ["left", "right", "middle"])
+      return false unless align_validator.valid?(@align)
       true
+    end
+
+    # Custom attribute writer method checking allowed values (enum).
+    # @param [Object] align Object to be assigned
+    def align=(align)
+      validator = EnumAttributeValidator.new('String', ["left", "right", "middle"])
+      unless validator.valid?(align)
+        fail ArgumentError, "invalid value for \"align\", must be one of #{validator.allowable_values}."
+      end
+      @align = align
     end
 
     # Checks equality by comparing each attribute.
@@ -121,12 +126,9 @@ module SigningTodayAPIClient
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          headers == o.headers &&
-          auth_username == o.auth_username &&
-          auth_password == o.auth_password &&
-          auth_mode == o.auth_mode &&
-          client_key == o.client_key &&
-          client_cert == o.client_cert
+          font == o.font &&
+          align == o.align &&
+          format == o.format
     end
 
     # @see the `==` method
@@ -138,7 +140,7 @@ module SigningTodayAPIClient
     # Calculates hash code according to all attributes.
     # @return [Integer] Hash code
     def hash
-      [headers, auth_username, auth_password, auth_mode, client_key, client_cert].hash
+      [font, align, format].hash
     end
 
     # Builds the object from hash

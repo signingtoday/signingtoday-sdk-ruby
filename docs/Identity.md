@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **id** | **String** | The uuid code that identifies the Identity | [optional] 
 **certificate** | **String** | The X.509 certificate in PEM format of the Identity | [optional] 
 **not_after** | **String** | Deadline of the Identity, expressed in ISO format | [optional] 
-**status** | **String** | Identity status which can be one of the following. When an identity request is send, the identity is created and the status is **pending** until the provider dont&#39;approve the request. Then status of the identity changes to **active**. If for some reason an error occurs during the process, or after that, the status will be **error**  | [optional] 
+**status** | **String** | Identity status which can be one of the following. When an identity request is send, the identity is created and the status is **pending** until the provider dont approve the request. Then status of the identity changes to **active**. If for some reason an error occurs during the process, or after that, the status will be **error**  | [optional] 
 **_next** | **String** | The next step to complete the activation procedure | [optional] 
 **actions** | [**IdentityActions**](IdentityActions.md) |  | [optional] 
 **provider** | **String** | The name of the provider that issued the certificate for the Identity | [optional] 
